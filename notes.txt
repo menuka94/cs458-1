@@ -10,3 +10,6 @@ for using metamask with npx hardhat local blockchain:
 npx hardhat node
 from metamask, pulldown menu choose "localhost:8545"
 then click upper right icon, create account, import, copy in private key from the "node" command from one of the accounts
+
+to disable auto browser page loading from npm start, from shell:
+export EDITOR=none
