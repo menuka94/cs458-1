@@ -1,4 +1,4 @@
-// symlink Voting.json to: ../../artifacts/contracts/pollfactory.sol/Voting.json
+// symlink Voting.json to: ../../artifacts/contracts/PollFactory.sol/Voting.json
 import VotingContract from "./Voting.json";
 import { ethers } from "ethers";
 

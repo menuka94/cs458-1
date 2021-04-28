@@ -9,10 +9,10 @@ async function main() {
 
     console.log("Account balance:", (await deployer.getBalance()).toString());
 
-    const Token = await ethers.getContractFactory("Voting");
+    const Token = await ethers.getContractFactory("PollFactory");
     const token = await Token.deploy();
 
-    console.log("Voting contract address:", token.address);
+    console.log("PollFactory contract address:", token.address);
 }
 
 main()

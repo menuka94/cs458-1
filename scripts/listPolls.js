@@ -1,3 +1,5 @@
+
+/*
 const ethers = require('ethers');
 
 const AppContractJSON = require('../artifacts/contracts/Voting.sol/Voting.json');
@@ -35,3 +37,4 @@ async function somePoll(app, id) {
 	const { app, signer } = await init();
 	await somePoll(app, 0);
 })()
+*/

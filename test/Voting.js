@@ -1,7 +1,7 @@
 // pragma experimental ABIEncoderV2;
-// supposedly the above will allow usage of string[] memory .. in function calls
-//
 
+
+/*
 const { expect } = require("chai");
 
 describe("Voting contract", function () {
@@ -73,3 +73,4 @@ describe("Voting contract", function () {
     });
 
 });
+*/
