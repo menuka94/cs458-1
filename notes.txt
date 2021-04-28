@@ -1,0 +1,15 @@
+to test:
+npx hardhat test
+
+to run locally:
+npx hardhat node
+npx hardhat run --network localhost scripts/deploy.js
+npx hardhat run scripts/listPolls.js
+
+for using metamask with npx hardhat local blockchain:
+npx hardhat node
+from metamask, pulldown menu choose "localhost:8545"
+then click upper right icon, create account, import, copy in private key from the "node" command from one of the accounts
+
+to disable auto browser page loading from npm start, from shell:
+export EDITOR=none
