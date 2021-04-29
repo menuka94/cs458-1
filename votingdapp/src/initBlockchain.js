@@ -1,6 +1,6 @@
 // symlink Voting.json to: ../../artifacts/contracts/Voting.sol/Voting.json
 // import VotingContract from "./Voting.json";
-import PollFactory from "./contract_ABI/PollFactory.sol/PollFactory.json"
+import PollFactory from "./contract_abi/PollFactory.sol/PollFactory.json"
 import {ethers} from "ethers";
 import store from "./redux/store";
 
