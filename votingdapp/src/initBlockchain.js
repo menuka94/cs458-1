@@ -1,6 +1,14 @@
-// symlink Voting.json to: ../../artifacts/contracts/PollFactory.sol/Voting.json
+// symlink Voting.json to: ../../artifacts/contracts/Voting.sol/Voting.json
 import VotingContract from "./Voting.json";
 import { ethers } from "ethers";
+import store from "./redux/store";
+
+function huh(data) {
+	return {
+		type: "SOMETHING",
+		payload: data
+	};
+}
 
 const initBlockchain = async() => {
 	let provider;
@@ -11,15 +19,15 @@ const initBlockchain = async() => {
 	const userAddress = await signer.getAddress();
 	console.log("su:", signer, userAddress);
 
-	let voting = null;
+	let contract = null;
 	console.log(VotingContract);
 	console.log("init1");
-	var fs = require("fs");
 	//const parsed = JSON.parse(VotingContract);
 	console.log("init2");
-	voting = new ethers.Contract('0x5FbDB2315678afecb367f032d93F642f64180aa3', VotingContract.abi, signer);
+	contract = new ethers.Contract('0x5FbDB2315678afecb367f032d93F642f64180aa3', VotingContract.abi, signer);
+	let data = { provider, signer, contract, userAddress };
+	store.dispatch(huh(data));
 	console.log("initBlockchain end ");
-	let data = { provider, signer, voting, userAddress };
 	return data;
 }
 
