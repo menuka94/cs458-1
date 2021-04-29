@@ -36,7 +36,7 @@ contract PollFactory {
         the function.
         Note: Solidity >= 0.6.0 returns nothing from push()
     */
-    function _addPoll(string memory _question, string[] memory _options) public {
+    function addPoll(string memory _question, string[] memory _options) public {
         polls.push();                   // Allocate space in storage for new Poll
         uint id = polls.length - 1;     // Get index as new size
         Poll storage poll = polls[id];  // Use index to get storage ptr to Poll
@@ -85,13 +85,13 @@ contract PollFactory {
     function votePoll(uint _id, uint8 _optionIndex) public {
         require(_id < polls.length);
         require(_optionIndex < polls[_id].options.length);
-        require(!hasVotedForPoll(_id, msg.sender));
+        require(!_hasVotedForPoll(_id, msg.sender));
 
         console.log("votePoll:", msg.sender, _id, _optionIndex);
-        console.log("hasVoted before:", hasVotedForPoll(_id, msg.sender));
+        console.log("hasVoted before:", _hasVotedForPoll(_id, msg.sender));
         polls[_id].voters.push(msg.sender);     // Add msg.sender to list of voters
         polls[_id].options[_optionIndex].votes++; // Increment chosen option's vote count
-        console.log("hasVoted after:", hasVotedForPoll(_id, msg.sender));
+        console.log("hasVoted after:", _hasVotedForPoll(_id, msg.sender));
     }
 
     /*
@@ -111,7 +111,7 @@ contract PollFactory {
     /*
         Checks if msg.sender has already voted for a specific poll.
     */
-    function hasVotedForPoll(uint _id, address _voter) private view returns (bool) {
+    function _hasVotedForPoll(uint _id, address _voter) private view returns (bool) {
         for (uint i = 0; i < polls[_id].voters.length; i++) {
             if (polls[_id].voters[i] == _voter) {
                 return true;
