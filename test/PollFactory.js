@@ -21,7 +21,6 @@ describe("PollFactory", function() {
     res[0].toNumber();
    */
 
-
   let question = "Who should be the next Grand Wizard?";
   let options = ["Alice", "Bob", "Jack Daniels"];
 
@@ -46,8 +45,11 @@ describe("PollFactory", function() {
 
     // Retrieve newly added poll, assert it was created properly and poll count increased.
     const newlyAddedPoll = await PollFactoryInstance.polls(0);
-    expect(newlyAddedPoll.question).to.equal(question);
-    expect(await PollFactoryInstance.numPolls()).to.equal(1);
+    expect(newlyAddedPoll.question).to.equal(question);                      // poll.question should be correct
+    expect(newlyAddedPoll.isOpen).to.equal(true);                       // poll should be open
+    expect(newlyAddedPoll.startDate.toNumber()).to.be.greaterThan(0);   // start date should be > 0
+    expect(newlyAddedPoll.endDate.toNumber()).to.equal(0);              // end date should be 0
+    expect(await PollFactoryInstance.numPolls()).to.equal(1);           // should only be 1 poll in existence
 
     // Retrieve newly added poll question, options, and votes from getPoll() function
     const [actualQuestion, actualOptions, actualVotes] = await PollFactoryInstance.getPoll(0);
@@ -83,5 +85,25 @@ describe("PollFactory", function() {
     await expect(PollFactoryInstance.connect(addr1).addPoll(question, options))
         .to.be.revertedWith("Ownable: caller is not the owner")
   });
+
+  it("Should be able to open/close a poll for voting", async function() {
+    await expect(PollFactoryInstance.addPoll(question, options))
+        .to.emit(PollFactoryInstance, 'NewPoll')
+
+    // Retrieve newly added poll, assert it is open
+    let newlyAddedPoll = await PollFactoryInstance.polls(0);
+    expect(newlyAddedPoll.isOpen).to.equal(true);
+
+    // Close the poll, assert it is not open and endDate >= startDate
+    await PollFactoryInstance.closePoll(0);
+    newlyAddedPoll = await PollFactoryInstance.polls(0);
+    expect(newlyAddedPoll.isOpen).to.equal(false);
+    expect(newlyAddedPoll.endDate.toNumber()).to.be.greaterThanOrEqual(newlyAddedPoll.startDate.toNumber());
+
+    // Try to vote for closed poll, should be reverted
+    await expect(PollFactoryInstance.votePoll(0, 1))
+        .to.be.revertedWith("Poll is closed")
+  });
+
 });
 

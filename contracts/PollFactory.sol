@@ -16,6 +16,7 @@ contract PollFactory is Ownable {
     struct Poll {
         string question;
         Option[] options;
+        bool isOpen;
         uint startDate;
         uint endDate;
         address[] voters;
@@ -42,8 +43,9 @@ contract PollFactory is Ownable {
         uint id = polls.length - 1;     // Get index as new size
         Poll storage poll = polls[id];  // Use index to get storage ptr to Poll
         poll.question     = _question;
+        poll.isOpen       = true;
         poll.startDate    = block.timestamp;
-        poll.endDate      = block.timestamp + 1 days; // Hardcode Poll end time to 1 day
+        poll.endDate      = 0;
 
         // Create and push Poll Options
         for (uint i = 0; i < _options.length; i++) {
@@ -52,6 +54,22 @@ contract PollFactory is Ownable {
 
         console.log("Added poll #", id);
         emit NewPoll(id);
+    }
+
+    /*
+        Disables a poll for voting.
+    */
+    function closePoll(uint _id) public onlyOwner validPollId(_id) pollOpen(_id) {
+        polls[_id].isOpen  = false;
+        polls[_id].endDate = block.timestamp;
+    }
+
+    /*
+        Enables a poll for voting.
+    */
+    function openPoll(uint _id) public onlyOwner validPollId(_id) pollClosed(_id) {
+        polls[_id].isOpen  = true;
+        polls[_id].endDate = 0;
     }
 
     /*
@@ -82,7 +100,7 @@ contract PollFactory is Ownable {
     /*
         Casts a single vote for an option in a poll.
     */
-    function votePoll(uint _id, uint8 _optionIndex) public validPollId(_id) {
+    function votePoll(uint _id, uint8 _optionIndex) public validPollId(_id) pollOpen(_id) {
         require(_optionIndex < polls[_id].options.length, "Option index is invalid");
         require(!_hasVotedForPoll(_id, msg.sender), "You've already voted for this poll");
 
@@ -105,6 +123,8 @@ contract PollFactory is Ownable {
         return results;
     }
 
+    // TODO: Refactor helper functions into separate file ---------
+
     /*
         Function modifier for ensuring a valid Poll ID is sent.
     */
@@ -115,6 +135,22 @@ contract PollFactory is Ownable {
 
     function _isValidPollId(uint _id) private view returns (bool) {
         return _id < polls.length;
+    }
+
+    /*
+        Function modifier for ensuring the poll is open.
+    */
+    modifier pollOpen(uint _id) {
+        require(polls[_id].isOpen, "Poll is closed");
+        _;
+    }
+
+    /*
+        Function modifier for ensuring the poll is open.
+    */
+    modifier pollClosed(uint _id) {
+        require(!polls[_id].isOpen, "Poll is open");
+        _;
     }
 
     /*
