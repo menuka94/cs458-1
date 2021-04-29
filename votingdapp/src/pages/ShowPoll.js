@@ -3,6 +3,7 @@ import {Link} from "react-router-dom";
 import store from "../redux/store";
 import {ethers} from "ethers";
 import {connect} from "react-redux";
+import {Button, Col, ListGroup, Row} from "react-bootstrap";
 
 
 function mapStateToProps(state) {
@@ -57,15 +58,25 @@ class ShowPoll extends Component {
         // weirdly <button> needs a key or it gets a console warning
         return (
           <div>
-              <h1>ShowPoll</h1>
-              <h2>Question: {this.state.pollnumber}</h2>
-              <h2>Question: {this.state.question}</h2>
-              {this.state.answers ? this.state.answers.map((thing, i) => ([
-                  <button key={i} onClick={() => this.chose(i)}>{thing}</button>,
-                  <br/>
-              ])) : "Loading..."}
+              <h1>Poll</h1>
+              <h3>Question No. {this.state.pollnumber}</h3>
+              <h2>{this.state.question}</h2>
+              <Row>
+                  <Col xs="auto">
+                      <ListGroup>
+                          {this.state.answers ? this.state.answers.map((answer, i) => ([
+                              <ListGroup.Item action key={i}
+                                              onClick={() => this.chose(i)}>
+                                  {answer}
+                              </ListGroup.Item>,
+                          ])) : "Loading..."}
+                      </ListGroup>
+                  </Col>
+              </Row>
               <br/>
-              <Link to="/">Go Home</Link>
+              <Link to="/">
+                  <Button type="button">Go Home</Button>
+              </Link>
           </div>
         );
     }

@@ -4,6 +4,7 @@ import {Link} from "react-router-dom";
 import {connect} from "react-redux";
 
 import store from "../redux/store";
+import {Button, Col, Container, Jumbotron, ListGroup, Row} from "react-bootstrap";
 
 function mapStateToProps(state) {
     console.log("Mainpage mapStateToProps", state);
@@ -36,16 +37,33 @@ class MainPage extends Component {
         console.log("Mainpage render this.state.numpolls:", this.state.numpolls);
         return (
           <div>
-              <h2>Node info:</h2><br/> {this.state.version}
-              <h2>Numpolls: {this.props.numpolls}</h2><br/>
-              <h2>isConnected: {this.props.isConnected}</h2><br/>
-              <ul>
-                  {this.props.polls.map((thing) => (
-                    <li key={thing}><Link to={{pathname: '/ShowPoll', id: {thing}}}>{thing}</Link>
-                    </li>
-                  ))}
-              </ul>
-              <Link to="/ShowPoll">ShowPoll</Link>
+              <Jumbotron fluid>
+                  <Container>
+                      <h4>Node info: {this.state.version}</h4>
+                      <br/>
+                      <h4>No. of Polls: {this.props.numpolls}</h4>
+                      <p/>
+                      <h4>isConnected: {this.props.isConnected}</h4>
+                      <br/>
+                  </Container>
+              </Jumbotron>
+              <Row>
+                  <Col xs="auto">
+                      <ListGroup horizontal>
+                          {this.props.polls.map((thing) => (
+                            <ListGroup.Item key={thing}>
+                                <Link to={{pathname: '/ShowPoll', id: {thing}}}>{thing}</Link>
+                            </ListGroup.Item>
+                          ))}
+                      </ListGroup>
+                  </Col>
+              </Row>
+              <br/>
+              <Row>
+                  <Link to="/ShowPoll">
+                      <Button type="button">ShowPoll</Button>
+                  </Link>
+              </Row>
           </div>
         )
     }
