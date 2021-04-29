@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import store from "./redux/store";
+import store from "../redux/store";
 import { ethers } from "ethers";
 import { connect } from "react-redux";
 
