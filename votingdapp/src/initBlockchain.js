@@ -3,6 +3,7 @@
 import PollFactory from "./contract_abi/PollFactory.sol/PollFactory.json"
 import {ethers} from "ethers";
 import store from "./redux/store";
+const ContractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 function blockchainInitialized(data) {
   return {
@@ -25,7 +26,7 @@ const initBlockchain = async () => {
   console.log(PollFactory);
   // the below is not necessary and breaks the code
   // const parsedAbi = JSON.parse(PollFactory.abi);
-  let contract = new ethers.Contract('0x5FbDB2315678afecb367f032d93F642f64180aa3', PollFactory.abi, signer);
+  let contract = new ethers.Contract(ContractAddress, PollFactory.abi, signer);
 
 
   let data = {provider, signer, contract, userAddress};
