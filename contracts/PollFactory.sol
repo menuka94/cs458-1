@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE */
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.3;
 pragma experimental ABIEncoderV2;
 
 import "hardhat/console.sol";
@@ -57,9 +57,9 @@ contract PollFactory {
         Retrieves a Poll by its id. We can't return a struct, so we have to disassemble the structs
         and return their components.
     */
-    function getPoll(uint _id) view public returns (string memory, string[] memory options, uint[] memory votes) {
-        require(_id < polls.length);
-        console.log("Poll number", _id, polls[_id].question);
+    function getPoll(uint _id) view public returns (string memory question, string[] memory options, uint[] memory votes) {
+        //function getPoll(uint _id) public view returns (uint endDate) {
+        require(_id < polls.length, "Poll ID is invalid");
 
         Poll memory poll = polls[_id]; // Bring Poll into memory
         string[] memory optionsStrings = new string[](poll.options.length);
@@ -69,23 +69,23 @@ contract PollFactory {
             optionsVotes[i] = poll.options[i].votes;
         }
 
-        return (poll.question, optionsStrings, optionsVotes);
+        return (polls[_id].question, optionsStrings, optionsVotes);
     }
 
     /*
         Fetches the total number of polls, inactive and active.
     */
-    function numPolls() view public returns (uint) {
-        return (polls.length);
+    function numPolls() public view returns (uint) {
+        return polls.length;
     }
 
     /*
         Casts a single vote for an option in a poll.
     */
     function votePoll(uint _id, uint8 _optionIndex) public {
-        require(_id < polls.length);
-        require(_optionIndex < polls[_id].options.length);
-        require(!_hasVotedForPoll(_id, msg.sender));
+        require(_id < polls.length, "Poll ID is invalid");
+        require(_optionIndex < polls[_id].options.length, "Option index is invalid");
+        require(!_hasVotedForPoll(_id, msg.sender), "You've already voted for this poll");
 
         console.log("votePoll:", msg.sender, _id, _optionIndex);
         console.log("hasVoted before:", _hasVotedForPoll(_id, msg.sender));
@@ -97,15 +97,14 @@ contract PollFactory {
     /*
         Counts the votes for each of the options.
     */
-    function countVotes(uint _id) view public returns (uint256[] memory res) {
-        require(_id < polls.length);
+    function countVotes(uint _id) public view returns (uint256[] memory res) {
+        require(_id < polls.length, "Poll ID is invalid");
         uint256[] memory results = new uint[](polls[_id].options.length);
         for (uint i = 0; i < polls[_id].options.length; i++) {
             results[i] = polls[_id].options[i].votes;
-            console.log("result", _id, i, results[i]);
         }
 
-        return (results);
+        return results;
     }
 
     /*
