@@ -78,5 +78,10 @@ describe("PollFactory", function() {
     // Try to vote again for another candidate, should be rejected
     await expect(PollFactoryInstance.votePoll(0, 1)).to.be.revertedWith("You've already voted for this poll");
   });
+
+  it("Only contract owner should be able to create a poll", async function() {
+    await expect(PollFactoryInstance.connect(addr1).addPoll(question, options))
+        .to.be.revertedWith("Ownable: caller is not the owner")
+  });
 });
 
