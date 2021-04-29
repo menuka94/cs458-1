@@ -1,18 +1,18 @@
-import './App.css';
+import '../App.css';
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
-import initBlockchain from "./initBlockchain";
-import Test from "./test";
-import store from "./redux/store";
+import initBlockchain from "../initBlockchain";
+import Test from "../test";
+import store from "../redux/store";
 
 function mapStateToProps(state) {
 	console.log("Mainpage mapStateToProps", state);
 	return state;
 }
 
-class Mainpage extends Component {
+class MainPage extends Component {
 	constructor(props) {
 		super(props);
 		//this.state = {isConnected: false, peers: 0, version: '', contract: null, numpolls: 0, polls: []};
@@ -57,4 +57,4 @@ class Mainpage extends Component {
 		)
 	}
 }
-export default connect(mapStateToProps)(Mainpage);
+export default connect(mapStateToProps)(MainPage);
