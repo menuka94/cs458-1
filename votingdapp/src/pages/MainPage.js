@@ -36,12 +36,16 @@ class MainPage extends Component {
         console.log("Mainpage render this.state.numpolls:", this.state.numpolls);
         return (
           <div>
-              <h2>Node info:</h2><br/> {this.state.version}
-              <h2>Numpolls: {this.props.numpolls}</h2><br/>
-              <h2>isConnected: {this.props.isConnected}</h2><br/>
+              <h3>Node info: {this.state.version}</h3>
+              <br/>
+              <h3>No. of Polls: {this.props.numpolls}</h3>
+              <br/>
+              <h3>isConnected: {this.props.isConnected}</h3>
+              <br/>
               <ul>
                   {this.props.polls.map((thing) => (
-                    <li key={thing}><Link to={{pathname: '/ShowPoll', id: {thing}}}>{thing}</Link>
+                    <li key={thing}>
+                        <Link to={{pathname: '/ShowPoll', id: {thing}}}>{thing}</Link>
                     </li>
                   ))}
               </ul>

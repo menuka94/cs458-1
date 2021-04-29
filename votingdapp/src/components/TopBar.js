@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 
-import {Menu, Header, Button, Navbar} from 'react-bootstrap';
+import {Navbar} from 'react-bootstrap';
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
 
@@ -14,8 +14,8 @@ class TopBar extends Component {
     render() {
         return (
           <div>
-              <Navbar>
-                  <Navbar.Brand href="#home">Completely Fair Voting DApp</Navbar.Brand>
+              <Navbar bg="dark" variant="dark">
+                  <Navbar.Brand href="#">Completely Fair Voting DApp</Navbar.Brand>
                   <Navbar.Toggle/>
                   <Navbar.Collapse className="justify-content-end">
                       <Navbar.Text>
