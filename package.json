@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/samincolo/cs458#readme",
   "dependencies": {
+    "dotenv": "^8.2.0",
     "hardhat": "^2.2.0"
   },
   "devDependencies": {
