@@ -23,8 +23,11 @@ const initBlockchain = async () => {
   console.log("userAddress:", userAddress);
 
   console.log(PollFactory);
-  const parsedAbi = JSON.parse(PollFactory.abi);
-  let contract = new ethers.Contract('0x5FbDB2315678afecb367f032d93F642f64180aa3', parsedAbi, signer);
+  // the below is not necessary and breaks the code
+  // const parsedAbi = JSON.parse(PollFactory.abi);
+  let contract = new ethers.Contract('0x5FbDB2315678afecb367f032d93F642f64180aa3', PollFactory.abi, signer);
+
+
   let data = {provider, signer, contract, userAddress};
   store.dispatch(blockchainInitialized(data));
   console.log("initBlockchain end");

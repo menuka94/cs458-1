@@ -5,18 +5,10 @@ import {BrowserRouter as Router, Route} from 'react-router-dom';
 import {Provider} from "react-redux";
 
 import initBlockchain from "./initBlockchain";
-import Test from "./test";
 import ShowPoll from "./pages/ShowPoll"
 import MainPage from "./pages/MainPage";
 
 import store from "./redux/store";
-
-function initState(data) {
-  return {
-    type: "setpolls",
-    payload: data
-  };
-}
 
 function setnumpolls(data) {
   return {
@@ -81,30 +73,6 @@ class App extends Component {
     );
   }
 
-  /*
-  render() {
-    return (
-      <Router>
-      <Route exact path ="/" component={ShowPoll}/>
-      <div>
-      <h2>Connected?:</h2><br/>
-      {this.state.isConnected?'Connected':'Not connected'}
-      <br/>
-      <h2>Node info:</h2><br /> {this.state.version}
-      <Test  contract={this.state} />
-      <h2>Numpolls: {this.state.numpolls}</h2><br/>
-      <h2>isConnected: {this.state.isConnected}</h2><br/>
-      <ul>
-      {this.state.polls.map((thing) => (
-        <li key={thing}>{thing}</li>
-      ))}
-      </ul>
-      <Link to="/ShowPoll">ShowPoll</Link>
-      </div>
-      </Router>
-    )
-  }
-  */
 }
 
 export default App;
