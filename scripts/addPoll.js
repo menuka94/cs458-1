@@ -7,6 +7,7 @@ async function init() {
   let app = new ethers.Contract(ContractAddress, AppContractJSON.abi, signer);
 
   await app.addPoll("Third poll", ["B1", "B2", "B3", "B4"]);
+  await app.addPoll("What is the largest country in the world?", ["Russia", "Canada", "China", "United States"]);
 
   let num = await app.numPolls();
   console.log("num:", num.toNumber());
