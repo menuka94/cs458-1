@@ -17,6 +17,8 @@ contract PollFactory is Ownable {
         string question;
         Option[] options;
         bool isOpen;
+        uint startDate;
+        uint endDate;
         address[] voters;
     }
 
@@ -42,6 +44,8 @@ contract PollFactory is Ownable {
         Poll storage poll = polls[id];  // Use index to get storage ptr to Poll
         poll.question     = _question;
         poll.isOpen       = true;
+        poll.startDate    = block.timestamp;
+        poll.endDate      = 0;
 
         // Create and push Poll Options
         for (uint i = 0; i < _options.length; i++) {
@@ -56,7 +60,16 @@ contract PollFactory is Ownable {
         Disables a poll for voting.
     */
     function closePoll(uint _id) public onlyOwner validPollId(_id) pollOpen(_id) {
-        polls[_id].isOpen = false;
+        polls[_id].isOpen  = false;
+        polls[_id].endDate = block.timestamp;
+    }
+
+    /*
+        Enables a poll for voting.
+    */
+    function openPoll(uint _id) public onlyOwner validPollId(_id) pollClosed(_id) {
+        polls[_id].isOpen  = true;
+        polls[_id].endDate = 0;
     }
 
     /*
