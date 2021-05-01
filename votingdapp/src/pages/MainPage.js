@@ -60,8 +60,8 @@ class MainPage extends Component {
               </Row>
               <br/>
               <Row>
-                  <Link to="/ShowPoll">
-                      <Button type="button">ShowPoll</Button>
+                  <Link to="/Addpoll">
+                      <Button type="button">AddPoll</Button>
                   </Link>
               </Row>
           </div>
