@@ -38,17 +38,13 @@ class ShowPoll extends Component {
 
     // note: the map function i counter is 0-based
     async chose(num) {
-        console.log("contract:", this.props.contract);
-        console.log("chose num:", num, typeof (num));
         /*
         if (window.confirm('Vote?')) {
           console.log("Confirmed");
         }
         */
-        // this fails with:
-        // "Trying to send an incompatible EIP-155 transaction, signed for another chain."
-        console.log("userAddress:", this.props.signer);
-        await this.props.contract.connect(this.props.signer).votePoll(0, 0);
+	console.log("ShowPoll id:", this.props.location.id.thing, num);
+        await this.props.contract.connect(this.props.signer).votePoll(this.props.location.id.thing-1, num);
     }
 
     render() {
