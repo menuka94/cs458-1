@@ -42,11 +42,10 @@ class MainPage extends Component {
                       <h4>Node info: {this.state.version}</h4>
                       <br/>
                       <h4>No. of Polls: {this.props.numpolls}</h4>
-                      <p/>
-                      <h4>isConnected: {this.props.isConnected}</h4>
                       <br/>
                   </Container>
               </Jumbotron>
+	      Vote:<br />
               <Row>
                   <Col xs="auto">
                       <ListGroup horizontal>
@@ -59,6 +58,20 @@ class MainPage extends Component {
                   </Col>
               </Row>
               <br/>
+	      Results:<br />
+              <Row>
+                  <Col xs="auto">
+                      <ListGroup horizontal>
+                          {this.props.polls.map((thing) => (
+                            <ListGroup.Item key={thing}>
+                                <Link to={{pathname: '/Results', id: {thing}}}>{thing}</Link>
+                            </ListGroup.Item>
+                          ))}
+                      </ListGroup>
+                  </Col>
+              </Row>
+              <br/>
+
               <Row>
                   <Link to="/Addpoll">
                       <Button type="button">AddPoll</Button>

@@ -12,6 +12,13 @@ function mapStateToProps(state) {
     return state;
 }
 
+function addpoll(data) {
+  return {
+    type: "addpoll"
+  };
+}
+
+
 class AddPoll extends Component {
 	constructor(props) {
         super(props);
@@ -37,7 +44,13 @@ class AddPoll extends Component {
 		console.log("handleSubmit", event);
 		console.log("handleSubmit question:", this.state.question);
 		console.log("handleSubmit inputs:", this.state.inputs);
-		await this.props.contract.connect(this.props.signer).addPoll(this.state.question, this.state.inputs);
+		try {
+			await this.props.contract.connect(this.props.signer).addPoll(this.state.question, this.state.inputs);
+			store.dispatch(addpoll({}));
+		} catch (error) {
+			alert("Error adding poll");
+			console.log("error adding poll:", error);
+		}
 	};
 
 	inputChange = async (e, index) => {

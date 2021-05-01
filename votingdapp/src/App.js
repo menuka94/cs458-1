@@ -10,6 +10,7 @@ import Test from "./test";
 import ShowPoll from "./pages/ShowPoll"
 import MainPage from "./pages/MainPage";
 import AddPoll from "./pages/AddPoll";
+import Results from "./pages/Results";
 
 import store from "./redux/store";
 import {Container} from "react-bootstrap";
@@ -83,6 +84,7 @@ class App extends Component {
                       <Route exact path="/" component={MainPage}/>
                       <Route exact path="/ShowPoll" component={ShowPoll}/>
                       <Route exact path="/AddPoll" component={AddPoll}/>
+                      <Route exact path="/Results" component={Results}/>
                   </Container>
               </Router>
           </Provider>
