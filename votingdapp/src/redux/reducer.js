@@ -35,6 +35,13 @@ export default function reducer(state = initialState, action) {
             polls: action.payload.polls
         });
     }
+    if (action.type === "addpoll") {
+        console.log("reducer add poll");
+	return Object.assign({}, state, {
+	    numpolls: state.numpolls+1,
+	    polls: state.polls.concat([state.polls.length+1])
+	});
+    }
     if (action.type === "init") {
         console.log("reducer init");
         return initialState;
