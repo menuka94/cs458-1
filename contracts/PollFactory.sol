@@ -22,6 +22,9 @@ contract PollFactory is Ownable {
         address[] voters;
     }
 
+    // Records voters' registration timestamps. Useful for knowing how long an address has been a registered voter.
+    mapping(address=>uint) registrationTimestamps;
+
     event NewPoll(uint id);
 
     Poll[] public polls;
@@ -31,6 +34,14 @@ contract PollFactory is Ownable {
     */
     constructor() {
         console.log("Deployed on blockchain");
+    }
+
+    /*
+        Records a registered timestamp for a voter address.
+    */
+    function registerVoter() public {
+        require(!isRegisteredToVote());
+        registrationTimestamps[msg.sender] = block.timestamp;
     }
 
     /*
@@ -100,7 +111,7 @@ contract PollFactory is Ownable {
     /*
         Casts a single vote for an option in a poll.
     */
-    function votePoll(uint _id, uint8 _optionIndex) public validPollId(_id) pollOpen(_id) {
+    function votePoll(uint _id, uint8 _optionIndex) public validPollId(_id) pollOpen(_id) isRegistered() {
         require(_optionIndex < polls[_id].options.length, "Option index is invalid");
         require(!_hasVotedForPoll(_id, msg.sender), "You've already voted for this poll");
 
@@ -163,5 +174,40 @@ contract PollFactory is Ownable {
             }
         }
         return false;
+    }
+
+    /*
+        Function modifier for ensuring the msg.sender is a registered voter.
+    */
+    modifier isRegistered() {
+        require(isRegisteredToVote(), "Sender is not a registered registered voter");
+        _;
+    }
+
+    /*
+        Checks if an address has been registered with a valid timestamp.
+    */
+    function isRegisteredToVote() public view returns (bool) {
+        if (registrationTimestamps[msg.sender] > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /*
+        Returns the amount of time a user has been registered to vote.
+    */
+    function registeredVoterFor() public view isRegistered() returns (uint) {
+        console.log(block.number);
+        return (block.timestamp - registrationTimestamps[msg.sender]);
+    }
+
+    /*
+        Returns the beginning time a user has been registered to vote.
+    */
+    function registeredVoterSince() public view isRegistered() returns (uint) {
+        console.log(block.number);
+        return (registrationTimestamps[msg.sender]);
     }
 }

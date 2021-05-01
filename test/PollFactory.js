@@ -63,10 +63,41 @@ describe("PollFactory", function() {
     }
   });
 
-  it("Should be able to vote for a poll", async function() {
+  it("Should be able to register to vote", async function() {
     // Add poll and expect a "NewPoll" event to be emitted
     await expect(PollFactoryInstance.addPoll(question, options))
         .to.emit(PollFactoryInstance, 'NewPoll')
+
+    // Register for voting
+    await PollFactoryInstance.registerVoter();
+    let result = await PollFactoryInstance.isRegisteredToVote();
+    await expect(result).to.equal(true);
+
+    // Artificially increase Ethereum Virtual Machine time and mine a new block with that time.
+    // This allows "block.timestamp" to take on a new value in the smart contract.
+    await network.provider.send("evm_increaseTime", [3600])
+    await network.provider.send("evm_mine")
+    result = await PollFactoryInstance.registeredVoterFor();
+    expect(result.toNumber()).to.be.greaterThan(0);
+  });
+
+  it("Should not be able to vote for a poll without registering", async function() {
+    // Add poll and expect a "NewPoll" event to be emitted
+    await expect(PollFactoryInstance.addPoll(question, options))
+        .to.emit(PollFactoryInstance, 'NewPoll')
+
+    // Try to vote for poll without registering, should be reverted.
+    await expect(PollFactoryInstance.votePoll(0, 2))
+        .to.be.revertedWith("Sender is not a registered registered voter")
+  });
+
+  it("Should be able to vote for a poll after registering", async function() {
+    // Add poll and expect a "NewPoll" event to be emitted
+    await expect(PollFactoryInstance.addPoll(question, options))
+        .to.emit(PollFactoryInstance, 'NewPoll')
+
+    // Register for voting
+    await PollFactoryInstance.registerVoter();
 
     // Have the owner of the contract vote for Jack Daniels
     await PollFactoryInstance.votePoll(0, 2);
