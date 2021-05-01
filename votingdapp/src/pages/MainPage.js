@@ -15,18 +15,28 @@ class MainPage extends Component {
     constructor(props) {
         super(props);
         this.state = store.getState();
+        this.state.userRegistered = false;
         console.log("Mainpage constructor state:", this.state);
     }
 
     componentDidMount = async () => {
         try {
             console.log("Mainpage componentDidMount store:", store.getState());
+            this.state.userRegistered =
+              await this.props.contract.connect(this.props.signer).isRegisteredToVote()
+            console.log("userRegistered:", this.state.userRegistered);
             //this.state = store.getState();
         } catch (error) {
             alert("Failed to load provider");
             console.log(error);
         }
     };
+
+    register = async event => {
+        console.log("Register");
+        await this.props.contract.connect(this.props.signer).registerVoter();
+        this.state.userRegistered = true;
+    }
 
     //<Test  contract={this.state} />
     render() {
@@ -76,6 +86,9 @@ class MainPage extends Component {
                   <Link to="/Addpoll">
                       <Button type="button">AddPoll</Button>
                   </Link>
+                  <Button type="button" onClick={this.register}
+                          disabled={!this.state.userRegistered}
+                  >Register</Button>
               </Row>
           </div>
         )
