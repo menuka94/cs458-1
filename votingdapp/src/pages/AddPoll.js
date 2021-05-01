@@ -13,98 +13,102 @@ function mapStateToProps(state) {
 }
 
 function addpoll(data) {
-  return {
-    type: "addpoll"
-  };
+    return {
+        type: "addpoll"
+    };
 }
 
 
 class AddPoll extends Component {
-	constructor(props) {
+    constructor(props) {
         super(props);
         this.state = store.getState();
-	this.setState({inputs: ['']});
-	this.setState({question: ''});
-	}
+        this.setState({inputs: ['']});
+        this.setState({question: ''});
+    }
 
-	componentDidMount = async () => {
-	this.setState({inputs: ['']});
-	this.setState({question: ''});
-    	}
+    componentDidMount = async () => {
+        this.setState({inputs: ['']});
+        this.setState({question: ''});
+    }
 
-	appendInput = async event => {
-		event.preventDefault();
-		//var newInput = 'input-${this.state.inputs.length}';
-		var newInput = '';
-		this.setState(prevState => ({ inputs: prevState.inputs.concat([newInput])}));
-	};
+    appendInput = async event => {
+        event.preventDefault();
+        //var newInput = 'input-${this.state.inputs.length}';
+        var newInput = '';
+        this.setState(prevState => ({inputs: prevState.inputs.concat([newInput])}));
+    };
 
-	handleSubmit = async event => {
-		event.preventDefault();
-		console.log("handleSubmit", event);
-		console.log("handleSubmit question:", this.state.question);
-		console.log("handleSubmit inputs:", this.state.inputs);
-		try {
-			await this.props.contract.connect(this.props.signer).addPoll(this.state.question, this.state.inputs);
-			store.dispatch(addpoll({}));
-		} catch (error) {
-			alert("Error adding poll");
-			console.log("error adding poll:", error);
-		}
-	};
+    handleSubmit = async event => {
+        event.preventDefault();
+        console.log("handleSubmit", event);
+        console.log("handleSubmit question:", this.state.question);
+        console.log("handleSubmit inputs:", this.state.inputs);
+        try {
+            await this.props.contract.connect(this.props.signer).addPoll(this.state.question, this.state.inputs);
+            store.dispatch(addpoll({}));
+            alert("Poll Added");
+        } catch (error) {
+            alert("Error adding poll");
+            console.log("error adding poll:", error);
+            alert("Poll Creation Failed");
+        }
+    };
 
-	inputChange = async (e, index) => {
-		if (index == -1) {
-			this.setState({question: e.target.value});
-		} else {
-			let arr = this.state.inputs;
-			arr[index] = e.target.value;
-			this.setState({inputs: arr});
-		}
-		console.log("inputChange:", index, e.target.value);
-	}
+    inputChange = async (e, index) => {
+        if (index == -1) {
+            this.setState({question: e.target.value});
+        } else {
+            let arr = this.state.inputs;
+            arr[index] = e.target.value;
+            this.setState({inputs: arr});
+        }
+        console.log("inputChange:", index, e.target.value);
+    }
 
 
-	render() {
+    render() {
+        //<Button type="submit" onClick={this.handleSubmit}>Submit</Button>
+        //{this.state.inputs ? this.state.inputs.map(input => [<input type="text" key={input} />, <br/>]) : "Loading..."}
+        return (
+          <div>
+              <form>
+                  Question:<br/>
+                  <input className="form-control" type="text"
+                         onChange={e => this.inputChange(e, -1)}/>
+                  <br/>
+                  Answers:<br/>
+                  <div id="dynamicInput">
+                  </div>
+                  {this.state.inputs ?
+                    this.state.inputs.map((input, i) => {
+                        return ([
+                            <input type="text" key={i} className="form-control"
+                                   onChange={e => this.inputChange(e, i)}/>,
+                            <br/>
+                        ]);
+                    }) : "Loading..."}
+                  <Row>
+                      <Col xs="auto">
+                          <Button type="button" onClick={this.handleSubmit}>Add
+                              Poll</Button>
+                      </Col>
+                      <Col xs="auto">
+                          <Button type="button" onClick={this.appendInput}>
+                              Add Input
+                          </Button>
+                      </Col>
+                      <Col xs="auto">
+                          <Link to="/">
+                              <Button type="button">Go Home</Button>
+                          </Link>
+                      </Col>
+                  </Row>
+              </form>
 
-	//<Button type="submit" onClick={this.handleSubmit}>Submit</Button>
-	//{this.state.inputs ? this.state.inputs.map(input => [<input type="text" key={input} />, <br/>]) : "Loading..."}
-	return (
-		<div>
-		<form>
-		Question:<br />
-		<input type="text" onChange={e => this.inputChange(e, -1)} />
-		<br />
-		Answers:<br />
-		<div id="dynamicInput">
-		</div>
-		{this.state.inputs ? 
-		this.state.inputs.map((input, i) => {
-			return ([
-			<input type="text" key={i} onChange={e => this.inputChange(e, i)} />,
-			<br />
-			]);
-		}) : "Loading..." }
-		<Row>
-		<Col xs="auto">
-		<Button type="button"  type="submit" onClick={this.handleSubmit}>Add Poll</Button>
-		</Col>
-		<Col xs="auto">
-		<Button type="button" onClick={this.appendInput}>
-			Add Input
-		</Button>
-		</Col>
-		<Col xs="auto">
-		<Link to="/">
-                  <Button type="button">Go Home</Button>
-                </Link>
-		</Col>
-		</Row>
-		</form>
-		  
-		</div>
-	);
-	}
+          </div>
+        );
+    }
 }
 
 export default connect(mapStateToProps)(AddPoll);

@@ -9,7 +9,7 @@
 5. `npx hardhat node` -- keep this running in a separate terminal window. Copy a private key from a generated account.
 6. `npx hardhat run --network localhost scripts/deploy.js` -- Copy the Contract Address and replace the `ContractAddress` 
    variable in both `scripts/addPoll.js` and `votingdapp/src/initBlockchain.js`
-7. `npx hardhat run scripts/addPolls.js`
+7. `npx hardhat run scripts/addPoll.js`
 8. `cd votingdapp` and `npm start`
 
 ### Connecting Metamask
