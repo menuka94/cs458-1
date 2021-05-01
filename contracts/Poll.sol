@@ -4,12 +4,14 @@
 pragma solidity ^0.8.3;
 pragma experimental ABIEncoderV2;
 
-struct Option {
-  string option;
-  uint256 votes;
-}
+
   
 interface Poll {
+  struct Option {
+    string option;
+    uint256 votes;
+  }
+
   function closePoll() {}
   function openPoll() {}
   function getPoll() {}

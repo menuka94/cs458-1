@@ -68,22 +68,6 @@ contract PollFactory is Ownable {
     }
 
     /*
-        Disables a poll for voting.
-    */
-    function closePoll(uint _id) public onlyOwner validPollId(_id) pollOpen(_id) {
-        polls[_id].isOpen  = false;
-        polls[_id].endDate = block.timestamp;
-    }
-
-    /*
-        Enables a poll for voting.
-    */
-    function openPoll(uint _id) public onlyOwner validPollId(_id) pollClosed(_id) {
-        polls[_id].isOpen  = true;
-        polls[_id].endDate = 0;
-    }
-
-    /*
         Retrieves a Poll by its id. We can't return a struct, so we have to disassemble the structs
         and return their components.
     */
@@ -91,14 +75,7 @@ contract PollFactory is Ownable {
                                                                      string[] memory options,
                                                                      uint[] memory votes) {
         Poll memory poll = polls[_id]; // Bring Poll into memory
-        string[] memory optionsStrings = new string[](poll.options.length);
-        uint[] memory optionsVotes = new uint[](poll.options.length);
-        for (uint i = 0; i < poll.options.length; i++) {
-            optionsStrings[i] = poll.options[i].option;
-            optionsVotes[i] = poll.options[i].votes;
-        }
 
-        return (polls[_id].question, optionsStrings, optionsVotes);
     }
 
     /*
@@ -146,22 +123,6 @@ contract PollFactory is Ownable {
 
     function _isValidPollId(uint _id) private view returns (bool) {
         return _id < polls.length;
-    }
-
-    /*
-        Function modifier for ensuring the poll is open.
-    */
-    modifier pollOpen(uint _id) {
-        require(polls[_id].isOpen, "Poll is closed");
-        _;
-    }
-
-    /*
-        Function modifier for ensuring the poll is open.
-    */
-    modifier pollClosed(uint _id) {
-        require(!polls[_id].isOpen, "Poll is open");
-        _;
     }
 
     /*
