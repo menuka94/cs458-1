@@ -9,11 +9,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 interface WeightedPollInterface {
     function getPoll() external view returns (address pollAddress,
         string memory pollQuestion,
+        bool isWeighted,
         bool isPollOpen,
         uint pollCreationDate,
         uint pollEndDate,
         string[] memory pollOptions,
-        uint[] memory pollVotes);
+        uint[] memory pollVotes,
+        uint[] memory pollWeights);
 }
 
 contract PollFactory is Ownable {
@@ -49,11 +51,13 @@ contract PollFactory is Ownable {
     */
     function getPoll(uint _id) public view validPollId(_id) returns (address pollAddress,
                                                                         string memory pollQuestion,
+                                                                        bool isWeighted,
                                                                         bool isPollOpen,
                                                                         uint pollCreationDate,
                                                                         uint pollEndDate,
                                                                         string[] memory pollOptions,
-                                                                        uint[] memory pollVotes) {
+                                                                        uint[] memory pollVotes,
+                                                                        uint[] memory pollWeights) {
         return polls[_id].getPoll();
     }
 
@@ -82,6 +86,7 @@ contract PollFactory is Ownable {
         Records a registered timestamp for a voter address.
     */
     function registerVoter() public {
+        console.log("PollFactory:" );
         require(!isRegisteredToVote());
         registrationTimestamps[msg.sender] = block.timestamp;
     }
@@ -90,7 +95,8 @@ contract PollFactory is Ownable {
         Function modifier for ensuring the msg.sender is a registered voter.
     */
     modifier isRegistered() {
-        require(isRegisteredToVote(), "Sender is not a registered registered voter");
+        //console.log("PollFactory: isRegistered() modifier");
+        require(isRegisteredToVote(), "Sender is not a registered voter");
         _;
     }
 
@@ -98,6 +104,10 @@ contract PollFactory is Ownable {
         Checks if an address has been registered with a valid timestamp.
     */
     function isRegisteredToVote() public view returns (bool) {
+//        console.log("PollFactory: isRegisteredToVote(): POLLFACTORY ADDRESS BELOW");
+//        console.log(address(this));
+//        console.log("PollFactory: isRegisteredToVote(): SENDER ADDRESS BELOW");
+//        console.log(msg.sender);
         if (registrationTimestamps[msg.sender] > 0) {
             return true;
         } else {
@@ -109,6 +119,7 @@ contract PollFactory is Ownable {
         Checks if an address has been registered with a valid timestamp.
     */
     function isAddressRegisteredToVote(address _address) public view returns (bool) {
+        console.log("Address received:", _address);
         if (registrationTimestamps[_address] > 0) {
             return true;
         } else {
@@ -120,15 +131,20 @@ contract PollFactory is Ownable {
         Returns the amount of time a user has been registered to vote.
     */
     function registeredVoterFor() public view isRegistered() returns (uint) {
-        console.log(block.number);
         return (block.timestamp - registrationTimestamps[msg.sender]);
+    }
+
+    /*
+        Returns the amount of time a user has been registered to vote.
+    */
+    function addressRegisteredVoterFor(address _address) public view isRegistered() returns (uint) {
+        return (block.timestamp - registrationTimestamps[_address]);
     }
 
     /*
         Returns the beginning time a user has been registered to vote.
     */
     function registeredVoterSince() public view isRegistered() returns (uint) {
-        console.log(block.number);
         return (registrationTimestamps[msg.sender]);
     }
 }

@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("PollFactory", function() {
+describe("WeightedPoll", function() {
 
     let WeightedPoll;
     let WeightedPollInstance;
@@ -32,22 +32,23 @@ describe("PollFactory", function() {
         time. It receives a callback, which can be async.
     */
     beforeEach(async function () {
-        // First deploy the PollFactory to handle voter registration
-        // and keep track of any deployed polls.
-        [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
         PollFactory = await ethers.getContractFactory("PollFactory");
         PollFactoryInstance = await PollFactory.deploy();
 
         // Deploy the poll with the PollFactory's address
         WeightedPoll = await ethers.getContractFactory("WeightedPoll");
-        WeightedPollInstance = await WeightedPoll.deploy(PollFactoryInstance.address, question, options);
+        WeightedPollInstance = await WeightedPoll.deploy(PollFactoryInstance.address, true, question, options);
+
+        // First deploy the PollFactory to handle voter registration
+        // and keep track of any deployed polls.
+        [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
     });
 
     it("Should not be able to vote for a poll without registering", async function() {
 
         // Try to vote for poll (3rd option) without registering, should be reverted.
         await expect(WeightedPollInstance.votePoll(2))
-            .to.be.revertedWith("Sender is not a registered registered voter")
+            .to.be.revertedWith("Sender is not a registered voter")
     });
 
     it("Should be able to vote once for a poll after registering", async function() {
@@ -66,6 +67,11 @@ describe("PollFactory", function() {
         expect(votes[1]).to.equal(0);
         expect(votes[2]).to.equal(1);
 
+        // Assert 1 vote for Jack Daniels
+        let weights = await WeightedPollInstance.countWeights();
+        console.log(weights[2]);
+
+
         // Try to vote again for another candidate, should be rejected
         await expect(WeightedPollInstance.votePoll(1)).to.be.revertedWith("You've already voted for this poll");
     });
@@ -75,22 +81,26 @@ describe("PollFactory", function() {
         // Retrieve newly added poll, assert it is open.
         let [ pollAddress,
             pollQuestion,
+            pollIsWeighted,
             pollIsOpen,
             pollCreationDate,
             pollEndDate,
             pollOptions,
-            pollVotes ] = await WeightedPollInstance.getPoll();
+            pollVotes,
+            pollWeights ] = await WeightedPollInstance.getPoll();
         expect(pollIsOpen).to.equal(true);
 
         // Close the poll, assert it is not open and endDate >= startDate
         await WeightedPollInstance.closePoll();
         [ pollAddress,
             pollQuestion,
+            pollIsWeighted,
             pollIsOpen,
             pollCreationDate,
             pollEndDate,
             pollOptions,
-            pollVotes ] = await WeightedPollInstance.getPoll();
+            pollVotes,
+            pollWeights ] = await WeightedPollInstance.getPoll();
         expect(pollIsOpen).to.equal(false);
 
         // Artificially increase Ethereum Virtual Machine time and mine a new block with that time.
@@ -100,10 +110,12 @@ describe("PollFactory", function() {
         [ pollAddress,
             pollQuestion,
             pollIsOpen,
+            pollIsWeighted,
             pollCreationDate,
             pollEndDate,
             pollOptions,
-            pollVotes ] = await WeightedPollInstance.getPoll();
+            pollVotes,
+            pollWeights ] = await WeightedPollInstance.getPoll();
         expect(pollEndDate.toNumber()).to.be.greaterThan(pollCreationDate.toNumber());
 
         // Try to vote for closed poll, should be reverted

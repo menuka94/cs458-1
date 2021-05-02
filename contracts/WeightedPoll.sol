@@ -14,6 +14,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 interface PollFactoryInterface {
   function isAddressRegisteredToVote(address _address) external view returns (bool);
   function addPoll(address newPollAddress) external;
+  function addressRegisteredVoterFor(address _address) external view returns (uint);
 }
 
 contract WeightedPoll is Ownable {
@@ -23,24 +24,30 @@ contract WeightedPoll is Ownable {
   struct Option {
     string option;
     uint256 votes;
+    uint256 voteWeight;
   }
 
   bool      private isOpen;
+  bool      private weightVotes; // Should this poll be weighted?
+  uint8     private weightRange; // [0, 200]
   string    private question;
   Option[]  private options;
   uint      private creationDate;
   uint      private endDate;
   address[] private voters;
 
-  constructor(address _pfAddress, string memory _question, string[] memory _options) {
+
+  constructor(address _pfAddress, bool _weightVotes, string memory _question, string[] memory _options) {
     pollFactoryContract = PollFactoryInterface(_pfAddress);
-    question = _question;
     isOpen    = true;
+    weightVotes = _weightVotes;
+    weightRange = 200;
+    question = _question;
     creationDate = block.timestamp;
     endDate   = 0;
 
     for (uint i = 0; i < _options.length; i++) {
-      options.push(Option(_options[i], 0));
+      options.push(Option(_options[i], 0, 0));
     }
 
     console.log("WeightedPoll: Deployed on blockchain with address", address(this));
@@ -86,32 +93,53 @@ contract WeightedPoll is Ownable {
   */
   function getPoll() public view returns (address pollAddress,
                                           string memory pollQuestion,
+                                          bool isWeighted,
                                           bool isPollOpen,
                                           uint pollCreationDate,
                                           uint pollEndDate,
                                           string[] memory pollOptions,
-                                          uint[] memory pollVotes) {
+                                          uint[] memory pollVotes,
+                                          uint[] memory pollWeights) {
     string[] memory optionsStrings = new string[](options.length);
     uint[] memory optionsVotes = new uint[](options.length);
+    uint[] memory optionsWeights = new uint[](options.length);
     for (uint i = 0; i < options.length; i++) {
       optionsStrings[i] = options[i].option;
-      optionsVotes[i] = options[i].votes;
+      optionsVotes[i]   = options[i].votes;
+      optionsWeights[i] = options[i].voteWeight;
     }
 
-    return (address(this), question, isOpen, creationDate, endDate, optionsStrings, optionsVotes);
+    return (address(this), question, isWeighted, isOpen, creationDate, endDate, optionsStrings, optionsVotes, optionsWeights);
   }
 
   /*
       Casts a single vote for an option in a poll.
   */
-  function votePoll(uint8 _optionIndex) public pollOpen hasNotAlreadyVoted isRegistered {
-    require(_optionIndex < options.length, "Option index is invalid");
-
+  function votePoll(uint8 _optionIndex) public pollOpen hasNotAlreadyVoted {
     console.log("votePoll:", msg.sender, _optionIndex);
-    console.log("hasVoted before:", _hasVotedForPoll(msg.sender));
-    voters.push(msg.sender);                                        // Add msg.sender to list of voters
-    options[_optionIndex].votes++;                                  // Increment chosen option's vote count
-    console.log("hasVoted after:", _hasVotedForPoll(msg.sender));
+    address senderAddress = msg.sender;
+
+    require(_optionIndex < options.length, "Option index is invalid");
+    require(pollFactoryContract.isAddressRegisteredToVote(senderAddress), "Sender is not a registered voter");
+    console.log("votePoll:", msg.sender, _optionIndex);
+
+
+    //console.log("hasVoted before:", _hasVotedForPoll(msg.sender));
+
+    // Get time that a voter has been registered to vote
+    uint addressRegisteredTime = pollFactoryContract.addressRegisteredVoterFor(msg.sender);
+    voters.push(msg.sender); // Add msg.sender to list of voters
+    options[_optionIndex].votes++; // Increment chosen option's vote count
+    options[_optionIndex].voteWeight += registeredTimeToVoteWeight(addressRegisteredTime);
+
+    //console.log("hasVoted after:", _hasVotedForPoll(msg.sender));
+  }
+
+  /*
+      Turns a time difference into a vote weight between 0 and 200.
+  */
+  function registeredTimeToVoteWeight(uint _time) private pure returns (uint256 weight) {
+    return 100;
   }
 
   /*
@@ -121,6 +149,18 @@ contract WeightedPoll is Ownable {
     uint256[] memory results = new uint[](options.length);
     for (uint i = 0; i < options.length; i++) {
       results[i] = options[i].votes;
+    }
+
+    return results;
+  }
+
+  /*
+      Counts the vote weights for each of the options.
+  */
+  function countWeights() public view returns (uint256[] memory res) {
+    uint256[] memory results = new uint[](options.length);
+    for (uint i = 0; i < options.length; i++) {
+      results[i] = options[i].voteWeight;
     }
 
     return results;
@@ -150,7 +190,11 @@ contract WeightedPoll is Ownable {
       Function modifier for ensuring the msg.sender is a registered voter.
   */
   modifier isRegistered() {
-    require(pollFactoryContract.isAddressRegisteredToVote(msg.sender), "Sender is not a registered registered voter");
+    //console.log("WeightedPoll: isRegistered(): WEIGHTEDPOLL ADDRESS BELOW");
+    //console.log(address(this));
+    //console.log("WeightedPoll: isRegistered(): SENDER ADDRESS BELOW");
+    //console.log(msg.sender);
+    require(pollFactoryContract.isAddressRegisteredToVote(msg.sender), "Sender is not a registered voter");
     _;
   }
 }

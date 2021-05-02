@@ -42,16 +42,18 @@ describe("PollFactory", function () {
 
         // Deploy a poll with the PollFactory's address
         let WeightedPoll = await ethers.getContractFactory("WeightedPoll");
-        await WeightedPoll.deploy(PollFactoryInstance.address, question, options);
+        await WeightedPoll.deploy(PollFactoryInstance.address, true, question, options);
 
         // Retrieve newly added poll, assert it was created properly and poll count increased.
         const [ pollAddress,
           pollQuestion,
+          pollIsWeighted,
           pollIsOpen,
           pollCreationDate,
           pollEndDate,
           pollOptions,
-          pollVotes ] = await PollFactoryInstance.getPoll(0);
+          pollVotes,
+          pollWeights ] = await PollFactoryInstance.getPoll(0);
 
         expect(pollQuestion).to.equal(question);                          // poll.question should be correct
         expect(pollIsOpen).to.equal(true);                          // poll should be open
