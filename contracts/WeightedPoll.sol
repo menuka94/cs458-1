@@ -40,7 +40,7 @@ contract WeightedPoll is Ownable {
     pollFactoryContract = PollFactoryInterface(_pfAddress);
     isOpen    = true;
     weightVotes = _weightVotes;
-    weightRange = 200;
+    weightRange = 100;
     question = _question;
     creationDate = block.timestamp;
     endDate   = 0;
@@ -126,10 +126,21 @@ contract WeightedPoll is Ownable {
   }
 
   /*
-      Turns a time difference into a vote weight between 0 and 200.
+      Turns a time difference into a vote weight between 0 and 100.
+      The _time difference variable is measured in seconds.
   */
   function registeredTimeToVoteWeight(uint _time) private pure returns (uint256 weight) {
-    return 100;
+    if (_time < 1 days) {
+      return 10;
+    } else if (_time < 1 weeks) {
+      return 20;
+    } else if (_time < 4 weeks) {
+      return 40;
+    } else if (_time < 180 days) {
+      return 80;
+    } else {
+      return 100;
+    }
   }
 
   /*
