@@ -22,7 +22,7 @@ describe("PollFactory", function () {
       res[0].toNumber();
      */
 
-    let question = "Who should be the next Grand Wizard?";
+    let question = "Who should be the next person?";
     let options = ["Alice", "Bob", "Don"];
 
     /*
