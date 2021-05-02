@@ -2,16 +2,16 @@ async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log(
-      "Deploying contracts with the account:",
+      "Deploying PollFactory contract with the account:",
       deployer.address
     );
 
     console.log("Account balance:", (await deployer.getBalance()).toString());
 
-    const App = await ethers.getContractFactory("PollFactory");
-    const token = await App.deploy();
+    const PollFactory = await ethers.getContractFactory("PollFactory");
+    const pollFactoryToken = await PollFactory.deploy();
 
-    console.log("PollFactory contract address:", token.address);
+    console.log("PollFactory contract address:", pollFactoryToken.address);
 }
 
 main()

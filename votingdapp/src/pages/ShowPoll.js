@@ -23,16 +23,38 @@ class ShowPoll extends Component {
         //this.state = store.getState();
         console.log("ShowPoll state:", this.state);
         console.log("ShowPoll props:", this.props);
+
         let answers = [];
-        let i = 0;
         let pollnumber = this.props.location.id.thing - 1;
-        const poll = await this.props.contract.getPoll(pollnumber);
-        const question = poll[0];
-        for (i = 0; i < poll[1].length; i++) {
-            answers.push((poll[1][i]));
+
+        const [ pollAddress,
+            pollQuestion,
+            pollIsWeighted,
+            pollIsOpen,
+            pollCreationDate,
+            pollEndDate,
+            pollOptions,
+            pollVotes,
+            pollWeights ] = await this.props.contract.getPoll(pollnumber);
+
+
+        console.log("pollAddress:", pollAddress);
+        console.log("pollQuestion:", pollQuestion);
+        console.log("pollIsWeighted:", pollIsWeighted);
+        console.log("pollIsOpen:", pollIsOpen);
+        console.log("pollEndDate:", pollEndDate);
+        console.log("pollCreationDate:", pollCreationDate);
+        console.log("pollOptions:", pollOptions);
+        console.log("pollVotes:", pollVotes);
+        console.log("pollWeights:", pollWeights);
+
+
+        for (let i = 0; i < pollOptions.length; i++) {
+            answers.push((pollOptions[i]));
         }
+
         this.setState({pollnumber: pollnumber + 1}); // fix these
-        this.setState({question: question});
+        this.setState({question: pollQuestion});
         this.setState({answers: answers});
     };
 
@@ -44,7 +66,7 @@ class ShowPoll extends Component {
         }
         */
 	console.log("ShowPoll id:", this.props.location.id.thing, num);
-        await this.props.contract.connect(this.props.signer).votePoll(this.props.location.id.thing-1, num);
+        await this.props.contract.connect(this.props.signer).votePollById(this.props.location.id.thing-1, num);
     }
 
     render() {
@@ -55,7 +77,7 @@ class ShowPoll extends Component {
         return (
           <div>
               <h1>Poll</h1>
-              <h3>Question No. {this.state.pollnumber}</h3>
+              <h3>Poll ID: {this.state.pollnumber}</h3>
               <h2>{this.state.question}</h2>
               <Row>
                   <Col xs="auto">

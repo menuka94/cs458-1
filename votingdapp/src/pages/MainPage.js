@@ -16,7 +16,7 @@ class MainPage extends Component {
         super(props);
         this.state = store.getState();
         this.setState({
-           userRegistered: false
+            userRegistered: true
         });
         console.log("Mainpage constructor state:", this.state);
     }
@@ -24,13 +24,11 @@ class MainPage extends Component {
     componentDidMount = async () => {
         try {
             console.log("Mainpage componentDidMount store:", store.getState());
+            let isRegistered = await this.props.contract.connect(this.props.signer).isRegisteredToVote();
             this.setState({
-                userRegistered: await this.props.contract.connect(this.props.signer).isRegisteredToVote()
+                userRegistered: isRegistered
             });
-            // this.state.userRegistered =
-            //   await this.props.contract.connect(this.props.signer).isRegisteredToVote()
-            console.log("userRegistered:", this.state.userRegistered);
-            //this.state = store.getState();
+
         } catch (error) {
             alert("componentDidMount(): Failed to load provider");
             console.log(error);
@@ -48,6 +46,8 @@ class MainPage extends Component {
 
     //<Test  contract={this.state} />
     render() {
+
+
         console.log("Mainpage render props:", this.props);
         console.log("Mainpage render getState:", store.getState());
         console.log("Mainpage render this.state.polls:", this.state.polls);
@@ -57,7 +57,7 @@ class MainPage extends Component {
           <div>
               <Jumbotron fluid>
                   <Container>
-                      <h4>Node info: {this.state.version}</h4>
+                      <h4>Smart Contract: Solidity Version 0.8.3</h4>
                       <br/>
                       <h4>No. of Polls: {this.props.numpolls}</h4>
                       <br/>

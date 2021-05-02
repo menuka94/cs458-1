@@ -25,11 +25,13 @@ class AddPoll extends Component {
         this.state = store.getState();
         this.setState({inputs: ['']});
         this.setState({question: ''});
+		    this.setState({weighted: true});
     }
 
     componentDidMount = async () => {
         this.setState({inputs: ['']});
         this.setState({question: ''});
+		    this.setState({weighted: true});
     }
 
     appendInput = async event => {
@@ -45,13 +47,11 @@ class AddPoll extends Component {
         console.log("handleSubmit question:", this.state.question);
         console.log("handleSubmit inputs:", this.state.inputs);
         try {
-            await this.props.contract.connect(this.props.signer).addPoll(this.state.question, this.state.inputs);
+            await this.props.contract.connect(this.props.signer).addPoll(this.state.weighted, this.state.question, this.state.inputs);
             store.dispatch(addpoll({}));
-            alert("Poll Added");
         } catch (error) {
             alert("Error adding poll");
             console.log("error adding poll:", error);
-            alert("Poll Creation Failed");
         }
     };
 
@@ -68,45 +68,43 @@ class AddPoll extends Component {
 
 
     render() {
+
         //<Button type="submit" onClick={this.handleSubmit}>Submit</Button>
         //{this.state.inputs ? this.state.inputs.map(input => [<input type="text" key={input} />, <br/>]) : "Loading..."}
         return (
-          <div>
-              <form>
-                  Question:<br/>
-                  <input className="form-control" type="text"
-                         onChange={e => this.inputChange(e, -1)}/>
-                  <br/>
-                  Answers:<br/>
-                  <div id="dynamicInput">
-                  </div>
-                  {this.state.inputs ?
-                    this.state.inputs.map((input, i) => {
-                        return ([
-                            <input type="text" key={i} className="form-control"
-                                   onChange={e => this.inputChange(e, i)}/>,
-                            <br/>
-                        ]);
-                    }) : "Loading..."}
-                  <Row>
-                      <Col xs="auto">
-                          <Button type="button" onClick={this.handleSubmit}>Add
-                              Poll</Button>
-                      </Col>
-                      <Col xs="auto">
-                          <Button type="button" onClick={this.appendInput}>
-                              Add Input
-                          </Button>
-                      </Col>
-                      <Col xs="auto">
-                          <Link to="/">
-                              <Button type="button">Go Home</Button>
-                          </Link>
-                      </Col>
-                  </Row>
-              </form>
+            <div>
+                <form>
+                    Question:<br/>
+                    <input type="text" onChange={e => this.inputChange(e, -1)}/>
+                    <br/>
+                    Answers:<br/>
+                    <div id="dynamicInput">
+                    </div>
+                    {this.state.inputs ?
+                        this.state.inputs.map((input, i) => {
+                            return ([
+                                <input type="text" key={i} onChange={e => this.inputChange(e, i)}/>,
+                                <br/>
+                            ]);
+                        }) : "Loading..."}
+                    <Row>
+                        <Col xs="auto">
+                            <Button type="button" type="submit" onClick={this.handleSubmit}>Add Poll</Button>
+                        </Col>
+                        <Col xs="auto">
+                            <Button type="button" onClick={this.appendInput}>
+                                Add Input
+                            </Button>
+                        </Col>
+                        <Col xs="auto">
+                            <Link to="/">
+                                <Button type="button">Go Home</Button>
+                            </Link>
+                        </Col>
+                    </Row>
+                </form>
 
-          </div>
+            </div>
         );
     }
 }
