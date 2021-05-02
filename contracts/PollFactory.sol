@@ -7,7 +7,8 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 interface WeightedPollInterface {
-    function getPoll() external view returns (string memory pollQuestion,
+    function getPoll() external view returns (address pollAddress,
+        string memory pollQuestion,
         bool isPollOpen,
         uint pollCreationDate,
         uint pollEndDate,
@@ -46,7 +47,8 @@ contract PollFactory is Ownable {
     /*
         Retrieves a poll address by its id.
     */
-    function getPoll(uint _id) public view validPollId(_id) returns (string memory pollQuestion,
+    function getPoll(uint _id) public view validPollId(_id) returns (address pollAddress,
+                                                                        string memory pollQuestion,
                                                                         bool isPollOpen,
                                                                         uint pollCreationDate,
                                                                         uint pollEndDate,

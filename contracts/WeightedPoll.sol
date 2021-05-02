@@ -84,7 +84,8 @@ contract WeightedPoll is Ownable {
       Retrieves a Poll's struct elements. We can't return a struct, so we have to disassemble the structs
       and return their components.
   */
-  function getPoll() public view returns (string memory pollQuestion,
+  function getPoll() public view returns (address pollAddress,
+                                          string memory pollQuestion,
                                           bool isPollOpen,
                                           uint pollCreationDate,
                                           uint pollEndDate,
@@ -97,7 +98,7 @@ contract WeightedPoll is Ownable {
       optionsVotes[i] = options[i].votes;
     }
 
-    return (question, isOpen, creationDate, endDate, optionsStrings, optionsVotes);
+    return (address(this), question, isOpen, creationDate, endDate, optionsStrings, optionsVotes);
   }
 
   /*

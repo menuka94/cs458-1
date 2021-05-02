@@ -45,7 +45,8 @@ describe("PollFactory", function () {
         await WeightedPoll.deploy(PollFactoryInstance.address, question, options);
 
         // Retrieve newly added poll, assert it was created properly and poll count increased.
-        const [ pollQuestion,
+        const [ pollAddress,
+          pollQuestion,
           pollIsOpen,
           pollCreationDate,
           pollEndDate,
@@ -77,14 +78,6 @@ describe("PollFactory", function () {
         result = await PollFactoryInstance.registeredVoterFor();
         expect(result.toNumber()).to.be.greaterThan(0);
     });
-
-
-
-    /*
-
-
-
-     */
 
 });
 

@@ -73,7 +73,8 @@ describe("PollFactory", function() {
     it("Owner should be able to open/close a poll for voting", async function() {
 
         // Retrieve newly added poll, assert it is open.
-        let [ pollQuestion,
+        let [ pollAddress,
+            pollQuestion,
             pollIsOpen,
             pollCreationDate,
             pollEndDate,
@@ -83,7 +84,8 @@ describe("PollFactory", function() {
 
         // Close the poll, assert it is not open and endDate >= startDate
         await WeightedPollInstance.closePoll();
-        [ pollQuestion,
+        [ pollAddress,
+            pollQuestion,
             pollIsOpen,
             pollCreationDate,
             pollEndDate,
@@ -95,7 +97,8 @@ describe("PollFactory", function() {
         // This allows "block.timestamp" to take on a new value in the smart contract.
         await network.provider.send("evm_increaseTime", [3600]);
         await network.provider.send("evm_mine");
-        [ pollQuestion,
+        [ pollAddress,
+            pollQuestion,
             pollIsOpen,
             pollCreationDate,
             pollEndDate,
