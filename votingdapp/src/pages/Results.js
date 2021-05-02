@@ -12,59 +12,90 @@ function mapStateToProps(state) {
 }
 
 class Results extends Component {
-	constructor(props) {
-        	super(props);
-        	this.state = store.getState();
-        	this.setState({answers: []});
-    	}
+    constructor(props) {
+        super(props);
+        this.state = store.getState();
+        this.setState({answers: []});
+    }
 
-	componentDidMount = async () => {
-		let pollnumber = this.props.location.id.thing - 1;
-		let answers = [];
+    componentDidMount = async () => {
+
 		let votes = [];
-		let i = 0;
-		const poll = await this.props.contract.getPoll(pollnumber);
-		const question = poll[0];
-		for (i = 0; i < poll[1].length; i++) {
-		    answers.push(poll[1][i]);
+		let weights = [];
+		let answers = [];
+		let pollnumber = this.props.location.id.thing - 1;
+
+		const [ pollAddress,
+			pollQuestion,
+			pollIsWeighted,
+			pollIsOpen,
+			pollCreationDate,
+			pollEndDate,
+			pollOptions,
+			pollVotes,
+			pollWeights ] = await this.props.contract.getPoll(pollnumber);
+
+        console.log("pollAddress:", pollAddress);
+        console.log("pollQuestion:", pollQuestion);
+        console.log("pollIsWeighted:", pollIsWeighted);
+        console.log("pollIsOpen:", pollIsOpen);
+        console.log("pollEndDate:", pollEndDate);
+        console.log("pollCreationDate:", pollCreationDate);
+        console.log("pollOptions:", pollOptions);
+        console.log("pollVotes:", pollVotes);
+        console.log("pollWeights:", pollWeights);
+
+
+        for (let i = 0; i < pollOptions.length; i++) {
+            answers.push(pollOptions[i]);
+        }
+
+        for (let i = 0; i < pollVotes.length; i++) {
+            votes.push(pollVotes[i].toNumber());
+        }
+
+		for (let i = 0; i < pollWeights.length; i++) {
+			weights.push(pollWeights[i].toNumber());
 		}
-		for (i = 0; i < poll[2].length; i++) {
-		    votes.push(poll[2][i].toNumber());
-		}
-		this.setState({pollnumber: pollnumber + 1});
-		this.setState({question: question});
-		this.setState({answers: answers});
-		this.setState({votes: votes});
-	}
 
-	render() {
-	console.log("Results id:", this.props.location.id.thing);
-	console.log("answers:", this.state.answers);
-	console.log("Votes:", this.state.votes);
 
-	return (
-		<div>
-		<h3>Results for poll {this.state.pollmnumber}</h3>
-		<h2>{this.state.question}</h2>
-		<Row>
-		  <Col xs="auto">
-		      <ListGroup>
-			  {(this.state.answers && this.state.votes) ? this.state.answers.map((answer, i) => ([
-			      <ListGroup.Item action key={i}>
-				  {answer} Votes: {this.state.votes[i]}
-			      </ListGroup.Item>,
-			  ])) : "Loading..."}
-		      </ListGroup>
-		  </Col>
-		</Row>
-		<br/>
-		<Link to="/">
-		  <Button type="button">Go Home</Button>
-		</Link>
 
-		</div>
-	);
-	}
+        this.setState({pollnumber: pollnumber + 1});
+        this.setState({question: pollQuestion});
+        this.setState({answers: answers});
+        this.setState({votes: votes});
+		this.setState({weights: weights});
+    }
+
+    render() {
+        console.log("Results id:", this.props.location.id.thing);
+        console.log("answers:", this.state.answers);
+        console.log("Votes:", this.state.votes);
+		console.log("Weights:", this.state.weights);
+
+        return (
+            <div>
+                <h3>Results for poll {this.state.pollnumber}</h3>
+                <h2>{this.state.question}</h2>
+                <Row>
+                    <Col xs="auto">
+                        <ListGroup>
+                            {(this.state.answers && this.state.votes && this.state.weights) ? this.state.answers.map((answer, i) => ([
+                                <ListGroup.Item action key={i}>
+                                    {answer} Votes: {this.state.votes[i]} Weights: {this.state.weights[i]}
+                                </ListGroup.Item>,
+                            ])) : "Loading..."}
+                        </ListGroup>
+                    </Col>
+                </Row>
+                <br/>
+                <Link to="/">
+                    <Button type="button">Go Home</Button>
+                </Link>
+
+            </div>
+        );
+    }
 }
 
 export default connect(mapStateToProps)(Results);

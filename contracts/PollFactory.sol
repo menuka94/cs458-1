@@ -91,7 +91,7 @@ contract PollFactory is Ownable {
         Records a registered timestamp for a voter address.
     */
     function registerVoter() public {
-        require(!isRegisteredToVote());
+        require(!isRegisteredToVote(), "PollFactory.sol: Sender is already registered to vote");
         registrationTimestamps[msg.sender] = block.timestamp;
     }
 

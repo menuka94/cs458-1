@@ -15,21 +15,39 @@ class MainPage extends Component {
     constructor(props) {
         super(props);
         this.state = store.getState();
+        this.setState({
+            userRegistered: true
+        });
         console.log("Mainpage constructor state:", this.state);
     }
 
     componentDidMount = async () => {
         try {
             console.log("Mainpage componentDidMount store:", store.getState());
-            //this.state = store.getState();
+            let isRegistered = await this.props.contract.connect(this.props.signer).isRegisteredToVote();
+            this.setState({
+                userRegistered: isRegistered
+            });
+
         } catch (error) {
             alert("Failed to load provider");
             console.log(error);
         }
     };
 
+    register = async event => {
+        console.log("Register");
+        await this.props.contract.connect(this.props.signer).registerVoter();
+        this.setState({
+            userRegistered: await this.props.contract.connect(this.props.signer).isRegisteredToVote()
+        });
+        alert("Registered to vote!");
+    }
+
     //<Test  contract={this.state} />
     render() {
+
+
         console.log("Mainpage render props:", this.props);
         console.log("Mainpage render getState:", store.getState());
         console.log("Mainpage render this.state.polls:", this.state.polls);
@@ -39,7 +57,7 @@ class MainPage extends Component {
           <div>
               <Jumbotron fluid>
                   <Container>
-                      <h4>Node info: {this.state.version}</h4>
+                      <h4>Smart Contract: Solidity Version 0.8.3</h4>
                       <br/>
                       <h4>No. of Polls: {this.props.numpolls}</h4>
                       <br/>
@@ -76,6 +94,9 @@ class MainPage extends Component {
                   <Link to="/Addpoll">
                       <Button type="button">AddPoll</Button>
                   </Link>
+                  <Button type="button" onClick={this.register}
+                          disabled={this.state.userRegistered}
+                  >Register</Button>
               </Row>
           </div>
         )
