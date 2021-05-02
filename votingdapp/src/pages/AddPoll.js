@@ -25,13 +25,13 @@ class AddPoll extends Component {
         this.state = store.getState();
         this.setState({inputs: ['']});
         this.setState({question: ''});
-		this.setState({weighted: true});
+		    this.setState({weighted: true});
     }
 
     componentDidMount = async () => {
         this.setState({inputs: ['']});
         this.setState({question: ''});
-		this.setState({weighted: true});
+		    this.setState({weighted: true});
     }
 
     appendInput = async event => {

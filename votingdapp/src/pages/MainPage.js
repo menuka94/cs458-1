@@ -30,7 +30,7 @@ class MainPage extends Component {
             });
 
         } catch (error) {
-            alert("Failed to load provider");
+            alert("componentDidMount(): Failed to load provider");
             console.log(error);
         }
     };
