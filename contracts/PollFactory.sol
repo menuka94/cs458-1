@@ -4,19 +4,20 @@ pragma solidity ^0.8.3;
 pragma experimental ABIEncoderV2;
 
 import "hardhat/console.sol";
+import "./WeightedPoll.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-interface WeightedPollInterface {
-    function getPoll() external view returns (address pollAddress,
-        string memory pollQuestion,
-        bool isWeighted,
-        bool isPollOpen,
-        uint pollCreationDate,
-        uint pollEndDate,
-        string[] memory pollOptions,
-        uint[] memory pollVotes,
-        uint[] memory pollWeights);
-}
+//interface WeightedPollInterface {
+//    function getPoll() external view returns (address pollAddress,
+//        string memory pollQuestion,
+//        bool isWeighted,
+//        bool isPollOpen,
+//        uint pollCreationDate,
+//        uint pollEndDate,
+//        string[] memory pollOptions,
+//        uint[] memory pollVotes,
+//        uint[] memory pollWeights);
+//}
 
 contract PollFactory is Ownable {
 
@@ -26,7 +27,7 @@ contract PollFactory is Ownable {
     event NewPoll(uint id);
 
     // Array of deployed polls.
-    WeightedPollInterface[] public polls;
+    WeightedPoll[] public polls;
 
     /*
         Called when the contract is deployed to the blockchain.
@@ -39,11 +40,15 @@ contract PollFactory is Ownable {
         After a poll is deployed, its address is sent to this function to be added
         to the total list of deployed polls, and a NewPoll event is emitted.
     */
-    function addPoll(address _newPollAddress) public {
-        polls.push(WeightedPollInterface(_newPollAddress)); // Add address to deployed polls
+    function addPoll(bool _weightVotes, string memory _question, string[] memory _options) public {
+        polls.push(new WeightedPoll(address(this), _weightVotes, _question, _options)); // Add address to deployed polls
         uint id = polls.length - 1; // Get index as new size
         console.log("Added poll #", id);
         emit NewPoll(id);
+    }
+
+    function votePollById(uint _id, uint8 _optionIndex) public isRegistered validPollId(_id) {
+        polls[_id].votePoll(_optionIndex, msg.sender);
     }
 
     /*
@@ -86,7 +91,6 @@ contract PollFactory is Ownable {
         Records a registered timestamp for a voter address.
     */
     function registerVoter() public {
-        console.log("PollFactory:" );
         require(!isRegisteredToVote());
         registrationTimestamps[msg.sender] = block.timestamp;
     }
@@ -95,8 +99,7 @@ contract PollFactory is Ownable {
         Function modifier for ensuring the msg.sender is a registered voter.
     */
     modifier isRegistered() {
-        //console.log("PollFactory: isRegistered() modifier");
-        require(isRegisteredToVote(), "Sender is not a registered voter");
+        require(isRegisteredToVote(), "PollFactory.sol: Sender is not a registered voter");
         _;
     }
 
@@ -104,10 +107,6 @@ contract PollFactory is Ownable {
         Checks if an address has been registered with a valid timestamp.
     */
     function isRegisteredToVote() public view returns (bool) {
-//        console.log("PollFactory: isRegisteredToVote(): POLLFACTORY ADDRESS BELOW");
-//        console.log(address(this));
-//        console.log("PollFactory: isRegisteredToVote(): SENDER ADDRESS BELOW");
-//        console.log(msg.sender);
         if (registrationTimestamps[msg.sender] > 0) {
             return true;
         } else {
@@ -119,7 +118,6 @@ contract PollFactory is Ownable {
         Checks if an address has been registered with a valid timestamp.
     */
     function isAddressRegisteredToVote(address _address) public view returns (bool) {
-        console.log("Address received:", _address);
         if (registrationTimestamps[_address] > 0) {
             return true;
         } else {
@@ -137,7 +135,7 @@ contract PollFactory is Ownable {
     /*
         Returns the amount of time a user has been registered to vote.
     */
-    function addressRegisteredVoterFor(address _address) public view isRegistered() returns (uint) {
+    function addressRegisteredVoterFor(address _address) public view returns (uint) {
         return (block.timestamp - registrationTimestamps[_address]);
     }
 

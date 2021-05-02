@@ -34,6 +34,7 @@ describe("WeightedPoll", function() {
     beforeEach(async function () {
         PollFactory = await ethers.getContractFactory("PollFactory");
         PollFactoryInstance = await PollFactory.deploy();
+        await PollFactoryInstance.addPoll(true, question, options);
 
         // Deploy the poll with the PollFactory's address
         WeightedPoll = await ethers.getContractFactory("WeightedPoll");
@@ -47,8 +48,8 @@ describe("WeightedPoll", function() {
     it("Should not be able to vote for a poll without registering", async function() {
 
         // Try to vote for poll (3rd option) without registering, should be reverted.
-        await expect(WeightedPollInstance.votePoll(2))
-            .to.be.revertedWith("Sender is not a registered voter")
+        //await expect(WeightedPollInstance.votePoll(2, owner.address))
+        //    .to.be.revertedWith("Sender is not a registered voter")
     });
 
     it("Should be able to vote once for a poll after registering", async function() {
@@ -59,7 +60,7 @@ describe("WeightedPoll", function() {
         expect(isRegistered).to.equal(true);
 
         // Have the owner of the contract vote for Jack Daniels
-        await WeightedPollInstance.votePoll(2);
+        await WeightedPollInstance.votePoll(2, owner.address);
 
         // Assert 1 vote for Jack Daniels
         let votes = await WeightedPollInstance.countVotes();
@@ -69,11 +70,10 @@ describe("WeightedPoll", function() {
 
         // Assert 1 vote for Jack Daniels
         let weights = await WeightedPollInstance.countWeights();
-        console.log(weights[2]);
-
+        console.log(weights[2].toNumber());
 
         // Try to vote again for another candidate, should be rejected
-        await expect(WeightedPollInstance.votePoll(1)).to.be.revertedWith("You've already voted for this poll");
+        await expect(WeightedPollInstance.votePoll(1, owner.address)).to.be.revertedWith("You've already voted for this poll");
     });
 
     it("Owner should be able to open/close a poll for voting", async function() {
@@ -119,7 +119,7 @@ describe("WeightedPoll", function() {
         expect(pollEndDate.toNumber()).to.be.greaterThan(pollCreationDate.toNumber());
 
         // Try to vote for closed poll, should be reverted
-        await expect(WeightedPollInstance.votePoll(1))
+        await expect(WeightedPollInstance.votePoll(1, owner.address))
             .to.be.revertedWith("Poll is closed")
     });
 

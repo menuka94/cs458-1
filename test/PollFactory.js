@@ -1,4 +1,5 @@
 const {expect} = require("chai");
+const { ethers } = require("hardhat");
 
 describe("PollFactory", function () {
 
@@ -40,9 +41,8 @@ describe("PollFactory", function () {
 
     it("Should be able to deploy a new Poll and retrieve it", async function () {
 
-        // Deploy a poll with the PollFactory's address
-        let WeightedPoll = await ethers.getContractFactory("WeightedPoll");
-        await WeightedPoll.deploy(PollFactoryInstance.address, true, question, options);
+        await PollFactoryInstance.addPoll(true, question, options);
+
 
         // Retrieve newly added poll, assert it was created properly and poll count increased.
         const [ pollAddress,
@@ -64,6 +64,7 @@ describe("PollFactory", function () {
             expect(pollVotes[i]).to.equal(0);
         }
         expect(await PollFactoryInstance.numPolls()).to.equal(1);   // should only be 1 poll in existence
+
     });
 
     it("Should be able to register to vote", async function() {
@@ -78,8 +79,13 @@ describe("PollFactory", function () {
         await network.provider.send("evm_increaseTime", [3600]);
         await network.provider.send("evm_mine");
         result = await PollFactoryInstance.registeredVoterFor();
+        console.log(result.toNumber());
         expect(result.toNumber()).to.be.greaterThan(0);
+
+
     });
+
+
 
 });
 
