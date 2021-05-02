@@ -23,7 +23,7 @@ describe("PollFactory", function () {
      */
 
     let question = "Who should be the next Grand Wizard?";
-    let options = ["Alice", "Bob", "Jack Daniels"];
+    let options = ["Alice", "Bob", "Don"];
 
     /*
       Runs before each test, re-deploying the contract every
